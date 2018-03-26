@@ -1,0 +1,10 @@
+{
+  "name": "odbc-json",
+  "version": "1.0.0",
+  "description": "An HTTP server which forwards query to a ODBC db and returns JSON results",
+  "main": "index.js",
+  "dependencies": {
+    "lodash": "^4.17.5",
+    "odbc": "^1.3.2"
+  }
+}
