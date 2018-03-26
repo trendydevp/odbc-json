@@ -18,6 +18,13 @@ const hasQueryTypeParam = url => url.query.types && String(url.query.types).trim
 const hasQueryNameParam = url => url.query.names && String(url.query.names).trim().length > 0;
 const parseURL = request => url.parse(request.url, true);
 
+const errorResponse = (response, code, message) => {
+  message = message || code;
+  response.writeHead(code, {'Content-Type': 'text/plain'});
+  response.write(message);
+  response.end();
+};
+
 const requestHandler = (request, response) => {
   try {
     const pageDetails = parseURL(request);
@@ -35,28 +42,12 @@ const requestHandler = (request, response) => {
 
     dbPool.open(cn, function(error, db) {
       if (error) {
-        response.writeHead(
-          500, {
-            'Content-Type': 'text/plain'
-          }
-        );
-
-        response.write('500 DB');
-        response.end();
-        return;
+        return errorResponse(response, 500, '500 DB');
       }
 
       db.query(pageDetails.query.query, function(error, data) {
         if (error) {
-          response.writeHead(
-            500, {
-              'Content-Type': 'text/plain'
-            }
-          );
-
-          response.write('500 Query');
-          response.end();
-          return;
+          return errorResponse(response, 500, '500 Query');
         }
 
         // dbPool.close(() => {});
@@ -95,15 +86,9 @@ const requestHandler = (request, response) => {
     });
   } catch (error) {
     const message = error.message;
-
-    response.writeHead(
-      Number(message) ? message : 404, {
-        'Content-Type': 'text/plain'
-      }
-    );
-
-    response.write(String(Number(message) ? message : 404));
-    response.end();
+    const code = Number(message) ? message : 404;
+    message = String(Number(message) ? message : 404);
+    return errorResponse(response, code, message);
   }
 }
 
@@ -115,4 +100,4 @@ server.listen(port, (error) => {
   }
 
   console.log(`Server is listening on ${port}`);
-})
+});
