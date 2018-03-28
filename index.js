@@ -85,7 +85,7 @@ const requestHandler = (request, response) => {
       });
     });
   } catch (error) {
-    const message = error.message;
+    let message = error.message;
     const code = Number(message) ? message : 404;
     message = String(Number(message) ? message : 404);
     return errorResponse(response, code, message);
